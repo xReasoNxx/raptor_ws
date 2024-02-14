@@ -1,0 +1,3 @@
+<launch>
+<node name="control_test" pkg="control_test" type="control_test_node" output="screen" />
+</launch>
