@@ -17,8 +17,9 @@ int Id = 0;
 double Vx;
 double Vy;
 double omega;
-const double L = 0.5; // Wheelbase (distance between front and rear wheels)
+const double L = 0.6; // Wheelbase (distance between front and rear wheels)
 const double W = 0.3; // Track width (distance between left and right wheels)
+
 
 static void roverControlCallback(const can_wrapper::RoverControl::ConstPtr &msg)
 {
