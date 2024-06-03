@@ -10,6 +10,7 @@
 #include "can_wrapper/RosCanConstants.hpp"
 #include "can_wrapper/VescMotorController.hpp"
 #include "can_wrapper/RoverControl.h"
+#include "can_wrapper/RoverController.hpp" 
 
 #include <ros/service.h>
 #include <std_srvs/SetBool.h>
@@ -27,12 +28,12 @@ enum class CanNodeMode
 double XVelAxis;
 double ZRotAxis;
 
-static void roverControlCallback(const can_wrapper::RoverControl::ConstPtr &msg)
-{
-	XVelAxis = msg->XVelAxis;
-	ZRotAxis = msg->ZRotAxis;
-	// Process the rover control message here
-}
+// static void roverControlCallback(const can_wrapper::RoverControl::ConstPtr &msg)
+// {
+// 	XVelAxis = msg->XVelAxis;
+// 	ZRotAxis = msg->ZRotAxis;
+// 	// Process the rover control message here
+// }
 
 int main(int argc, char *argv[])
 {
@@ -41,11 +42,12 @@ int main(int argc, char *argv[])
 
 	MotorControl motorControl(n);
 	VescMotorController vmc;
+	RoverController roverController(0.933481,0.73946);
 
 	CanNodeMode canNodeMode = CanNodeMode::Created;
 	ros::Rate rate(1000);
 
-	ros::Subscriber sub = n.subscribe("/MQTT/RoverControl", 100, roverControlCallback);
+	ros::Subscriber sub = n.subscribe("/MQTT/RoverControl", 100, &RoverController::roverControlCallback, &roverController);
 
 	std_srvs::SetBool::Request req;
 	std_srvs::SetBool::Response res;
@@ -89,6 +91,8 @@ int main(int argc, char *argv[])
 			break;
 
 		case CanNodeMode::Opened:
+			vel = roverController.prepareWheelsMessage();
+            motorControl.sendMotorVel(vel);
 			// vel.header.stamp = ros::Time::now();
 			// vel.frontLeft.commandId = 0; // setPos is not valid here
 			// vel.frontLeft.commandIdAngle = 4; // only setPos is implemented in stepper driver
