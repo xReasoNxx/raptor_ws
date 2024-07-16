@@ -34,6 +34,7 @@ can_wrapper::Wheels RoverController::prepareWheelsMessage() const
 
     // Calculate velocity and angle for each wheel based on target velocities and wheel geometry
     // Calculate velocities for each wheel
+    double norm = 2.1;
     double omega = ZRotAxis / L;
     double V_FL_x = XVelAxis - omega * W / 2;
     double V_FL_y = ZRotAxis + omega * L / 2;
@@ -45,16 +46,16 @@ can_wrapper::Wheels RoverController::prepareWheelsMessage() const
     double V_RR_y = ZRotAxis - omega * L / 2;
 
     // Calculate resultant velocities
-    double V_FL = sqrt(V_FL_x * V_FL_x + V_FL_y * V_FL_y);
-    double V_FR = sqrt(V_FR_x * V_FR_x + V_FR_y * V_FR_y);
-    double V_RL = sqrt(V_RL_x * V_RL_x + V_RL_y * V_RL_y);
-    double V_RR = sqrt(V_RR_x * V_RR_x + V_RR_y * V_RR_y);
+    double V_FL = sqrt(V_FL_x * V_FL_x + V_FL_y * V_FL_y)/norm;
+    double V_FR = sqrt(V_FR_x * V_FR_x + V_FR_y * V_FR_y)/norm;
+    double V_RL = sqrt(V_RL_x * V_RL_x + V_RL_y * V_RL_y)/norm;
+    double V_RR = sqrt(V_RR_x * V_RR_x + V_RR_y * V_RR_y)/norm;
 
     // Calculate angles in radians
     double theta_FL = tangent360(V_FL_y, V_FL_x);
     double theta_FR = tangent360(V_FR_y, V_FR_x);
-    double theta_RL = tangent360(V_RL_y, V_RL_x);
-    double theta_RR = tangent360(V_RR_y, V_RR_x);
+    double theta_RL = 360 - theta_FL;
+    double theta_RR = 360 - theta_FR;
 
     // Prepare the Wheels message
     int IdAngle = 4;
@@ -83,3 +84,4 @@ can_wrapper::Wheels RoverController::prepareWheelsMessage() const
     vel.rearRight.commandId = Id;
     return vel;
 }
+
